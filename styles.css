@@ -243,6 +243,7 @@ body {
   width: 100%; height: 100%;
   display: block;
   cursor: grab;
+  touch-action: pan-y;        /* up/down still scrolls the page; sideways swipes are ours, to spin the flute */
 }
 #gl:active { cursor: grabbing; }
 

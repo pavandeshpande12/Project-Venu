@@ -181,10 +181,10 @@ function onDragStart(x, y) {
   if (stage) stage.setDragging(true);
   glCanvas.style.cursor = 'grabbing';
 }
-function onDragMove(x, y) {
+function onDragMove(x, y, touch = false) {
   if (!isDragging) return;
   const dx = x - dragStartX;
-  const dy = y - dragStartY;
+  const dy = touch ? 0 : y - dragStartY;      // touch: only sideways spins the flute; up/down scrolls the page
   dragStartX = x;
   dragStartY = y;
   dragAccX = clamp(dragAccX + dy * DRAG_SENSITIVITY, -1.2, 1.2);
@@ -212,10 +212,11 @@ glCanvas.addEventListener('touchstart', (e) => {
 }, { passive: true });
 window.addEventListener('touchmove', (e) => {
   if (isDragging && e.touches.length === 1) {
-    onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+    onDragMove(e.touches[0].clientX, e.touches[0].clientY, true);
   }
 }, { passive: true });
 window.addEventListener('touchend', () => { if (isDragging) onDragEnd(); });
+window.addEventListener('touchcancel', () => { if (isDragging) onDragEnd(); });   // the browser took the gesture over (scrolling)
 
 // ── scroll state ─────────────────────────────────────────────
 let targetP = 0;
@@ -287,11 +288,12 @@ function frame(now) {
   smoothMY += (rawMY - smoothMY) * mouseEase;
 
   if (!isDragging) {
-    const decay = Math.pow(0.03, dt);
+    const decay = Math.pow(0.35, dt);              // eases back to rest over about a second
     dragAccX *= decay;
     dragAccY *= decay;
     if (Math.abs(dragAccX) < 0.001) dragAccX = 0;
     if (Math.abs(dragAccY) < 0.001) dragAccY = 0;
+    if (stage) stage.setDrag(dragAccX, dragAccY);   // hand the easing-back values to the flute
   }
 
   if (stage) {

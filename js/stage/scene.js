@@ -110,6 +110,7 @@ export async function createStage(canvas, onProgress) {
   const baseToneExposure = renderer.toneMappingExposure;
 
   let dragRX = 0, dragRY = 0;
+  let spinX = 0, spinY = 0;
   let dragging = false;
 
   function setMouse(x, y) { mx = x; my = y; }
@@ -133,14 +134,12 @@ export async function createStage(canvas, onProgress) {
     const tilt = interpKeyframes(TILT, progress, 1);
     flute.rotation.z = tilt + cameraPath.portraitTilt;
 
-    if (!dragging) {
-      dragRX *= Math.pow(0.03, dt);
-      dragRY *= Math.pow(0.03, dt);
-      if (Math.abs(dragRX) < 0.001) dragRX = 0;
-      if (Math.abs(dragRY) < 0.001) dragRY = 0;
-    }
-    flute.rotation.y = dragRY;
-    flute.rotation.x = 0.25 + dragRX;
+    // ease toward the drag target: the flute follows the finger smoothly instead of jumping to it
+    const follow = 1 - Math.exp(-(dragging ? 16 : 5) * dt);
+    spinY += (dragRY - spinY) * follow;
+    spinX += (dragRX - spinX) * follow;
+    flute.rotation.y = spinY;
+    flute.rotation.x = 0.25 + spinX;
 
     const bg = interpKeyframes(BG_COLORS, progress, 3);
     scene.background.setRGB(bg[0] / 255, bg[1] / 255, bg[2] / 255);
