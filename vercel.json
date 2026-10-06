@@ -1,0 +1,6 @@
+{
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "mkdir dist && cp -r index.html styles.css favicon.ico flute-icon.svg flute-icon-32.png flute-icon-180.png js assets vendor dist/",
+  "outputDirectory": "dist"
+}
