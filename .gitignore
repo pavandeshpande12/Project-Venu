@@ -1,0 +1,14 @@
+# big intermediate files made by the build scripts (regenerate with the steps in README.md)
+tools/_work/
+tools/*.png
+
+# the original downloaded music file (assets/score.mp3 is the version the site uses)
+audio/
+
+# reference image, not part of the site
+ref/
+
+# misc
+.DS_Store
+Thumbs.db
+node_modules/

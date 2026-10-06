@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Venu</title>
+  <link rel="icon" href="flute-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="flute-icon-32.png" sizes="32x32" type="image/png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="flute-icon-180.png">
+  <meta name="description" content="An immersive journey into Krishna's divine flute.">
+  <meta property="og:title" content="वेणु — Venu">
+  <meta property="og:description" content="An immersive scroll-driven 3D journey into Krishna's divine flute.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="वेणु — Venu">
+  <meta name="twitter:description" content="An immersive scroll-driven 3D journey into Krishna's divine flute.">
+  <meta name="twitter:image" content="assets/og-image.png">
+  <meta name="theme-color" content="#080810">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/build/three.module.js",
+        "three/addons/": "./vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+
+<section id="journey">
+  <div id="stage">
+    <canvas id="gl" aria-label="Krishna's bamboo flute with peacock feather"></canvas>
+    <div id="progress-bar"></div>
+
+    <div id="captions">
+      <div class="caption hero" data-window="0,0,0.07,0.10">
+        <p class="hero-deva">वेणु</p>
+        <h1>Venu</h1>
+        <p class="sub">the flute of the divine</p>
+      </div>
+
+      <article class="caption chapter" data-window="0.13,0.16,0.22,0.25" data-chapter="1">
+        <span class="numeral">chapter i</span>
+        <h2>Adhara Sudhā</h2>
+        <p class="sanskrit">अधरसुधा — the nectar of the lips</p>
+        <span class="rule"></span>
+        <p class="desc">Where breath enters bamboo and emerges as song. The player's lips rest at this threshold — the narrow gate between silence and sound, where the finite meets the infinite.</p>
+      </article>
+
+      <article class="caption chapter" data-window="0.28,0.31,0.37,0.40" data-chapter="2">
+        <span class="numeral">chapter ii</span>
+        <h2>Vansha</h2>
+        <p class="sanskrit">वंश — the bamboo</p>
+        <span class="rule"></span>
+        <p class="desc">The reed must be hollowed to sing. Emptied of pith, freed of self — only then can the divine breath flow through it. The grain remembers the forest; the hollow remembers surrender.</p>
+      </article>
+
+      <article class="caption chapter" data-window="0.43,0.46,0.52,0.55" data-chapter="3">
+        <span class="numeral">chapter iii</span>
+        <h2>Randhra</h2>
+        <p class="sanskrit">रन्ध्र — the openings</p>
+        <span class="rule"></span>
+        <p class="desc">Six wounds drilled through the body. Each one a doorway for a different prayer. The player's fingers dance — opening, closing — and the bamboo speaks in voices it never knew it held.</p>
+      </article>
+
+      <article class="caption chapter" data-window="0.58,0.61,0.67,0.70" data-chapter="4">
+        <span class="numeral">chapter iv</span>
+        <h2>Granthi</h2>
+        <p class="sanskrit">ग्रन्थि — the knot</p>
+        <span class="rule"></span>
+        <p class="desc">Where the bamboo once branched, a ring remains. The knots mark seasons of growth — memories that hollowing could not erase. Proof that even a vessel of the divine once reached for its own light.</p>
+      </article>
+
+      <article class="caption chapter" data-window="0.73,0.76,0.82,0.85" data-chapter="5">
+        <span class="numeral">chapter v</span>
+        <h2>Mayūra Piccha</h2>
+        <p class="sanskrit">मयूरपिच्छ — the peacock plume</p>
+        <span class="rule"></span>
+        <p class="desc">His mark upon it. A feather set in gold, with silk cords hanging beside it — it says: this is not merely an instrument. It belongs to the one whose music breaks the rivers’ rush and sets the stars to dance.</p>
+      </article>
+
+      <aside class="caption verse" data-window="0.13,0.16,0.22,0.25" lang="sa">
+        <p class="v-sa">गोप्यः किमाचरदयं कुशलं स्म वेणुर्दामोदराधरसुधामपि गोपिकानाम्</p>
+        <p class="v-iast">gopyaḥ kim ācarad ayaṁ kuśalaṁ sma veṇur dāmodarādhara-sudhām api gopikānām</p>
+        <p class="v-en" lang="en">what good deed did this flute perform, that it alone enjoys the nectar of Dāmodara’s lips — meant for the gopīs?</p>
+        <p class="v-src" lang="en">Śrīmad Bhāgavatam 10.21.9</p>
+      </aside>
+
+      <aside class="caption verse" data-window="0.28,0.31,0.37,0.40" lang="sa">
+        <p class="v-sa">भुङ्क्ते स्वयं यदवशिष्टरसं ह्रदिन्यो हृष्यत्त्वचोऽश्रु मुमुचुस्तरवो यथार्याः</p>
+        <p class="v-iast">bhuṅkte svayaṁ yad avaśiṣṭa-rasaṁ hradinyo hṛṣyat-tvaco ’śru mumucus taravo yathāryāḥ</p>
+        <p class="v-en" lang="en">it drinks it all itself, leaving only a remnant — and the rivers shiver with joy, and the trees, like elders of its line, weep tears of delight</p>
+        <p class="v-src" lang="en">Śrīmad Bhāgavatam 10.21.9</p>
+      </aside>
+
+      <aside class="caption verse" data-window="0.43,0.46,0.52,0.55" lang="sa">
+        <p class="v-sa">रन्ध्रान् वेणोरधरसुधयापूरयन्</p>
+        <p class="v-iast">randhrān veṇor adhara-sudhayāpūrayan</p>
+        <p class="v-en" lang="en">filling the hollows of the flute with the nectar of his lips</p>
+        <p class="v-src" lang="en">Śrīmad Bhāgavatam 10.21.5</p>
+      </aside>
+
+      <aside class="caption verse" data-window="0.58,0.61,0.67,0.70" lang="sa">
+        <p class="v-sa">गावश्च कृष्णमुखनिर्गतवेणुगीतपीयूषम्</p>
+        <p class="v-iast">gāvaś ca kṛṣṇa-mukha-nirgata-veṇu-gīta-pīyūṣam</p>
+        <p class="v-en" lang="en">the cows, ears raised like cups, drink the nectar of the flute-song flowing from Kṛṣṇa’s mouth</p>
+        <p class="v-src" lang="en">Śrīmad Bhāgavatam 10.21.13</p>
+      </aside>
+
+      <aside class="caption verse" data-window="0.73,0.76,0.82,0.85" lang="sa">
+        <p class="v-sa">बर्हापीडं नटवरवपुः कर्णयोः कर्णिकारं</p>
+        <p class="v-iast">barhāpīḍaṁ naṭa-vara-vapuḥ karṇayoḥ karṇikāraṁ</p>
+        <p class="v-en" lang="en">a peacock plume upon his crown, karṇikāra blossoms at his ears — the finest of dancers</p>
+        <p class="v-src" lang="en">Śrīmad Bhāgavatam 10.21.5</p>
+      </aside>
+
+      <div class="caption closing" data-window="0.89,0.92,1.0,1.01">
+        <p class="om jai">जय श्री कृष्ण</p>
+        <p class="jai-trans">jaya śrī kṛṣṇa</p>
+        <p class="verse-sanskrit">नादब्रह्म</p>
+        <p class="verse-trans">nādabrahma — sound is the divine</p>
+        <p class="final">When the last note fades,<br>do not search for it.<br>The silence that follows<br>is also His song.</p>
+        <p class="end-mark">वेणुगीतम् — the song of the flute</p>
+        <p class="credit">music · <a href="https://pixabay.com/music/india-indian-classical-raga-537491/" target="_blank" rel="noopener">“Indian Classical Raga”</a> by Alex Morgan · Pixabay</p>
+        <p class="credit built">© 2026 · Built by Pavan Deshpande and Claude Opus 5.5</p>
+        <div class="closing-actions">
+          <button id="return-top" aria-label="Return to top">↑ return to the beginning</button>
+        </div>
+      </div>
+    </div>
+
+<span id="mantra">ॐ नमो भगवते वासुदेवाय</span>
+
+<nav id="holes" aria-label="Sections">
+      <button data-section="1" aria-label="Adhara Sudhā"></button>
+      <button data-section="2" aria-label="Vansha"></button>
+      <button data-section="3" aria-label="Randhra"></button>
+      <button data-section="4" aria-label="Granthi"></button>
+      <button data-section="5" aria-label="Mayūra Piccha"></button>
+      <button data-section="6" aria-label="Closing"></button>
+    </nav>
+    <span id="sound-hint" aria-hidden="true">tap anywhere for sound</span>
+    <button id="sound-btn" aria-label="Toggle sound" title="Toggle sound">
+      <span class="sound-icon">
+        <span class="sound-bar"></span>
+        <span class="sound-bar"></span>
+        <span class="sound-bar"></span>
+      </span>
+    </button>
+    <div id="scroll-prompt">
+      <span>scroll</span>
+      <i class="arrow"></i>
+    </div>
+    <div id="loader" aria-live="polite">
+      <div class="loader-flute" aria-hidden="true">
+        <div class="lf-body"><div class="loader-fill"></div></div>
+        <span class="lf-hole" style="--i:0"></span>
+        <span class="lf-hole" style="--i:1"></span>
+        <span class="lf-hole" style="--i:2"></span>
+        <span class="lf-hole" style="--i:3"></span>
+        <span class="lf-hole" style="--i:4"></span>
+        <span class="lf-hole" style="--i:5"></span>
+      </div>
+      <span class="label">tuning the flute</span>
+      <p class="gate-verse" lang="sa">ॐ नमो भगवते वासुदेवाय</p>
+      <button id="enter-btn" type="button">enter</button>
+      <p class="gate-footer">© 2026 · Built by Pavan Deshpande and Claude Opus 5.5</p>
+    </div>
+  </div>
+</section>
+
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
