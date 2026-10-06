@@ -79,12 +79,15 @@ function detectQuality() {
 const QUALITY = detectQuality();
 
 const SETTINGS = {
-  low:    { pixelRatio: 1.0, shadows: false,  shadowSize: 512,  bokeh: false, bloomStrength: 0.35 },
-  medium: { pixelRatio: 1.25, shadows: true,  shadowSize: 512,  bokeh: false, bloomStrength: 0.45 },
-  high:   { pixelRatio: 1.5,  shadows: true,  shadowSize: 1024, bokeh: true,  bloomStrength: 0.55 },
+  // pixelRatio: how many drawn pixels per screen pixel (phones have 2-3; the page lowers it by itself if the device is slow)
+  // msaa: edge smoothing for the effects pipeline (the browser's own anti-aliasing does not reach it)
+  low:    { pixelRatio: 1.5,  msaa: 2, shadows: false,  shadowSize: 512,  bokeh: false, bloomStrength: 0.35 },
+  medium: { pixelRatio: 2.0,  msaa: 4, shadows: true,  shadowSize: 512,  bokeh: false, bloomStrength: 0.45 },
+  high:   { pixelRatio: 1.5,  msaa: 4, shadows: true,  shadowSize: 1024, bokeh: true,  bloomStrength: 0.55 },
 };
 
 export function getQuality() { return QUALITY; }
+export function getMaxPixelRatio() { return Math.min(window.devicePixelRatio, SETTINGS[QUALITY].pixelRatio); }
 
 // the biggest texture this GPU can hold, and whether it is worth loading the 8K body textures here
 export function canUseHiResTextures() {
@@ -113,7 +116,9 @@ export function createRenderer(canvas) {
 export function createComposer(renderer, scene, camera) {
   const q = SETTINGS[QUALITY];
   const size = renderer.getSize(new THREE.Vector2());
-  const composer = new EffectComposer(renderer);
+  const pr = renderer.getPixelRatio();
+  const target = new THREE.WebGLRenderTarget(size.x * pr, size.y * pr, { type: THREE.HalfFloatType, samples: q.msaa });
+  const composer = new EffectComposer(renderer, target);
 
   composer.addPass(new RenderPass(scene, camera));
 

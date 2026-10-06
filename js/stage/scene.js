@@ -127,7 +127,23 @@ export async function createStage(canvas, onProgress) {
     composer.setSize(w, h);
   }
 
+  // if the device cannot keep up, quietly draw fewer pixels (never goes back up, so it cannot flip-flop)
+  let age = 0, slow = 0, frameEma = 1 / 60;
+  function watchSpeed(dt) {
+    age += dt;
+    frameEma += (dt - frameEma) * 0.06;
+    if (age < 4) return;                                   // skip start-up (shader compiling, textures arriving)
+    slow = frameEma > 1 / 34 ? slow + dt : Math.max(0, slow - dt * 2);
+    const ratio = renderer.getPixelRatio();
+    if (slow > 2 && ratio > 1) {
+      renderer.setPixelRatio(Math.max(1, ratio * 0.8));
+      resize();
+      slow = 0;
+    }
+  }
+
   function update(progress, wallTime, dt) {
+    watchSpeed(dt);
     const time = REDUCE_MOTION ? 0 : wallTime;       // reduced motion: nothing sways, drifts or flickers on its own
     cameraPath.update(progress, mx, my);
 
