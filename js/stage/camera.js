@@ -25,8 +25,8 @@ const WIDE_Z = 3.2;        // z of the full-flute shots (hero, closing)
 const FIT_HALF_WIDTH = 2.3; // half-width of flute + feather that must stay in frame on wide (non-tilted) screens
 const PORTRAIT_SHIFT = 2.5;  // sideways shift (world units) for shots flagged portraitShift, on tall screens
 const PORTRAIT_LIFT = 0.35;  // upward shift (world units) for the same shots
-const PORTRAIT_TILT = -0.78; // radians: on tall screens the full-flute shots lay the flute diagonally, so it uses the screen's height
-const TILT_HALF_WIDTH = 2.2;  // half-width the tilted flute needs
+const PORTRAIT_TILT = 0;     // radians of extra roll for the full-flute shots on tall screens (0 = lies straight; try -0.3 for a slant)
+const TILT_HALF_WIDTH = 2.5;  // half-width the tilted flute needs
 const MAX_FIT = 7;         // safety cap on the pull-back (a real phone needs about 4-5)
 
 export function createCameraPath(camera) {
