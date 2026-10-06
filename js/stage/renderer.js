@@ -82,7 +82,7 @@ const SETTINGS = {
   // pixelRatio: how many drawn pixels per screen pixel (phones have 2-3; the page lowers it by itself if the device is slow)
   // msaa: edge smoothing for the effects pipeline (the browser's own anti-aliasing does not reach it)
   low:    { pixelRatio: 1.5,  msaa: 2, shadows: false,  shadowSize: 512,  bokeh: false, bloomStrength: 0.35 },
-  medium: { pixelRatio: 2.0,  msaa: 4, shadows: true,  shadowSize: 512,  bokeh: false, bloomStrength: 0.45 },
+  medium: { pixelRatio: 2.0,  msaa: 2, shadows: true,  shadowSize: 512,  bokeh: false, bloomStrength: 0.45 },
   high:   { pixelRatio: 1.5,  msaa: 4, shadows: true,  shadowSize: 1024, bokeh: true,  bloomStrength: 0.55 },
 };
 
