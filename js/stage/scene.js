@@ -131,7 +131,7 @@ export async function createStage(canvas, onProgress) {
     cameraPath.update(progress, mx, my);
 
     const tilt = interpKeyframes(TILT, progress, 1);
-    flute.rotation.z = tilt;
+    flute.rotation.z = tilt + cameraPath.portraitTilt;
 
     if (!dragging) {
       dragRX *= Math.pow(0.03, dt);

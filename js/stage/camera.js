@@ -22,16 +22,19 @@ const KEYFRAMES = [
 
 const PARALLAX_SCALE = 0.045;
 const WIDE_Z = 3.2;        // z of the full-flute shots (hero, closing)
-const FIT_HALF_WIDTH = 2.3; // flute + feather half-width that should stay in frame
+const FIT_HALF_WIDTH = 2.3; // half-width of flute + feather that must stay in frame on wide (non-tilted) screens
 const PORTRAIT_SHIFT = 2.5;  // sideways shift (world units) for shots flagged portraitShift, on tall screens
 const PORTRAIT_LIFT = 0.35;  // upward shift (world units) for the same shots
-const MAX_FIT = 3.6;       // cap on the pull-back for very narrow screens
+const PORTRAIT_TILT = -0.78; // radians: on tall screens the full-flute shots lay the flute diagonally, so it uses the screen's height
+const TILT_HALF_WIDTH = 2.2;  // half-width the tilted flute needs
+const MAX_FIT = 7;         // safety cap on the pull-back (a real phone needs about 4-5)
 
 export function createCameraPath(camera) {
   const pos = new THREE.Vector3();
   const target = new THREE.Vector3();
   let fitWeight = 0;
   let shiftWeight = 0;
+  let tallness = 0;
 
   function interpolate(progress) {
     let idx = 0;
@@ -68,8 +71,16 @@ export function createCameraPath(camera) {
 
       // only the full-flute shots pull back; close-ups keep their framing
       const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-      const fit = THREE.MathUtils.clamp(FIT_HALF_WIDTH / (halfH * camera.aspect) / WIDE_Z, 1, MAX_FIT);
+      tallness = THREE.MathUtils.clamp((0.8 - camera.aspect) / 0.3, 0, 1);
+      const need = THREE.MathUtils.lerp(FIT_HALF_WIDTH, TILT_HALF_WIDTH, tallness);       // tilted, it needs less width
+      const fit = THREE.MathUtils.clamp(need / (halfH * camera.aspect) / WIDE_Z, 1, MAX_FIT);
       pos.z *= 1 + (fit - 1) * fitWeight;
+      // on tall screens the whole flute is a thin line near the middle, so sit it a little lower, under the title
+      if (camera.aspect < 0.8) {
+        const sink = 0.07 * 2 * halfH * pos.z * fitWeight;
+        pos.y += sink;
+        target.y += sink;
+      }
 
       // tall screens: slide the view toward the feather end so the ferrule stays in frame
       const tall = Math.max(0, 1 - camera.aspect) * shiftWeight;
@@ -88,5 +99,7 @@ export function createCameraPath(camera) {
       camera.lookAt(target);
     },
     get target() { return target; },
+    // extra roll for the flute, only in the full-flute shots and only on tall screens
+    get portraitTilt() { return PORTRAIT_TILT * tallness * fitWeight; },
   };
 }
