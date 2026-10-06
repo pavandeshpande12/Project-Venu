@@ -1,0 +1,9 @@
+# files Cloudflare must NOT publish on the live site
+.git
+.gitignore
+.nojekyll
+.wrangler
+.assetsignore
+wrangler.jsonc
+README.md
+tools
