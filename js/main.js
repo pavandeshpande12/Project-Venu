@@ -217,17 +217,52 @@ window.addEventListener('mousemove', (e) => {
 });
 window.addEventListener('mouseup', () => { if (isDragging) onDragEnd(); });
 
+// ── pinch to zoom, double-tap to zoom (phones) ──────────────
+let pinch = null;                 // { dist, zoom, fx, fy } while two fingers are down
+let zoomAtProgress = 0;           // the scroll position where the zoom happened
+let lastTap = { t: 0, x: 0, y: 0 };
+const touchHint = document.getElementById('touch-hint');
+let hintActive = true;
+const pinchDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+const toScreenFocus = (x, y) => [(x / innerWidth) * 2 - 1, -((y / innerHeight) * 2 - 1)];
+function zoomTo(z, x, y) {
+  if (!stage) return;
+  const [fx, fy] = toScreenFocus(x, y);
+  stage.setZoom(z, fx, fy);
+  zoomAtProgress = progress;
+  if (touchHint) { hintActive = false; touchHint.style.opacity = '0'; }
+}
+
 glCanvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {                    // two fingers: pinch, not rotate
+    if (isDragging) onDragEnd();
+    const t = e.touches;
+    pinch = { dist: pinchDist(t), zoom: stage ? stage.zoom : 1,
+              x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 };
+    return;
+  }
   if (e.touches.length !== 1) return;
-  onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+  const { clientX: x, clientY: y } = e.touches[0];
+  const now = performance.now();
+  if (now - lastTap.t < 320 && Math.hypot(x - lastTap.x, y - lastTap.y) < 40) {   // double-tap
+    zoomTo(stage && stage.zoom > 1.2 ? 1 : 2.4, x, y);
+    lastTap.t = 0;
+  } else {
+    lastTap = { t: now, x, y };
+  }
+  onDragStart(x, y);
 }, { passive: true });
 window.addEventListener('touchmove', (e) => {
+  if (pinch && e.touches.length === 2) {
+    zoomTo(pinch.zoom * (pinchDist(e.touches) / pinch.dist), pinch.x, pinch.y);
+    return;
+  }
   if (isDragging && e.touches.length === 1) {
     onDragMove(e.touches[0].clientX, e.touches[0].clientY, true);
   }
 }, { passive: true });
-window.addEventListener('touchend', () => { if (isDragging) onDragEnd(); });
-window.addEventListener('touchcancel', () => { if (isDragging) onDragEnd(); });   // the browser took the gesture over (scrolling)
+window.addEventListener('touchend', (e) => { if (e.touches.length < 2) pinch = null; if (isDragging) onDragEnd(); });
+window.addEventListener('touchcancel', () => { pinch = null; if (isDragging) onDragEnd(); });   // the browser took the gesture over (scrolling)
 
 // ── scroll state ─────────────────────────────────────────────
 let targetP = 0;
@@ -280,6 +315,7 @@ function updateOverlays() {
   if (section === 0 && lastSection !== 0) lastSection = 0;
 
   scrollPrompt.style.opacity = (1 - smoothstep(0.015, 0.06, progress)).toFixed(3);
+  if (touchHint && hintActive) touchHint.style.opacity = (1 - smoothstep(0.015, 0.06, progress)).toFixed(3);
   progressBar.style.width = `${(progress * 100).toFixed(1)}%`;
 }
 
@@ -298,6 +334,7 @@ function frame(now) {
   smoothMX += (rawMX - smoothMX) * mouseEase;
   smoothMY += (rawMY - smoothMY) * mouseEase;
 
+  if (stage && stage.zoom > 1 && Math.abs(progress - zoomAtProgress) > 0.012) stage.setZoom(1, 0, 0);   // scrolled on: back to the normal view
   if (!isDragging) {
     const decay = Math.pow(0.35, dt);              // eases back to rest over about a second
     dragAccX *= decay;

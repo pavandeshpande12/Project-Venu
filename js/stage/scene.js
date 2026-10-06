@@ -145,7 +145,7 @@ export async function createStage(canvas, onProgress) {
   function update(progress, wallTime, dt) {
     watchSpeed(dt);
     const time = REDUCE_MOTION ? 0 : wallTime;       // reduced motion: nothing sways, drifts or flickers on its own
-    cameraPath.update(progress, mx, my);
+    cameraPath.update(progress, mx, my, dt);
 
     const tilt = interpKeyframes(TILT, progress, 1);
     flute.rotation.z = tilt + cameraPath.portraitTilt;
@@ -204,5 +204,6 @@ export async function createStage(canvas, onProgress) {
   }
 
   resize();
-  return { update, resize, setMouse, triggerPulse, setDrag, setDragging };
+  function setZoom(z, fx, fy) { cameraPath.setZoom(z, fx, fy); }
+  return { update, resize, setMouse, triggerPulse, setDrag, setDragging, setZoom, get zoom() { return cameraPath.zoomGoal; } };
 }

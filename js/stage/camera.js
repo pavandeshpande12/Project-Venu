@@ -35,6 +35,7 @@ export function createCameraPath(camera) {
   let fitWeight = 0;
   let shiftWeight = 0;
   let tallness = 0;
+  let zoomGoal = 1, zoomNow = 1, zoomFx = 0, zoomFy = 0;   // pinch zoom: 1 = the normal view; fx, fy = where on the screen (-1..1) it zooms toward
 
   function interpolate(progress) {
     let idx = 0;
@@ -66,7 +67,7 @@ export function createCameraPath(camera) {
   }
 
   return {
-    update(progress, mouseX = 0, mouseY = 0) {
+    update(progress, mouseX = 0, mouseY = 0, dt = 0.016) {
       interpolate(progress);
 
       // only the full-flute shots pull back; close-ups keep their framing
@@ -90,6 +91,19 @@ export function createCameraPath(camera) {
       pos.y -= PORTRAIT_LIFT * tall;
       target.y -= PORTRAIT_LIFT * tall;
 
+      // pinch zoom (phones): move in toward the pinched spot. Only the full-flute shots zoom; the close-ups already are close
+      zoomNow += (zoomGoal - zoomNow) * (1 - Math.exp(-9 * (dt || 0.016)));
+      const z = 1 + (zoomNow - 1) * fitWeight;
+      if (z > 1.001) {
+        const d = Math.abs(pos.z - target.z);
+        const k = 1 - 1 / z;
+        const ox = zoomFx * d * halfH * camera.aspect * k;
+        const oy = zoomFy * d * halfH * k;
+        pos.x += ox; target.x += ox;
+        pos.y += oy; target.y += oy;
+        pos.z = target.z + (pos.z - target.z) / z;
+      }
+
       const dist = pos.distanceTo(target);
       const scale = dist * PARALLAX_SCALE;
       pos.x += mouseX * scale;
@@ -99,6 +113,8 @@ export function createCameraPath(camera) {
       camera.lookAt(target);
     },
     get target() { return target; },
+    setZoom(z, fx = 0, fy = 0) { zoomGoal = Math.min(3.6, Math.max(1, z)); zoomFx = fx; zoomFy = fy; },
+    get zoomGoal() { return zoomGoal; },
     // extra roll for the flute, only in the full-flute shots and only on tall screens
     get portraitTilt() { return PORTRAIT_TILT * tallness * fitWeight; },
   };
