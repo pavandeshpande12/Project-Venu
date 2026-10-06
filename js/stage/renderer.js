@@ -127,7 +127,9 @@ export function createComposer(renderer, scene, camera) {
     composer.addPass(bokeh);
   }
 
-  const bloom = new UnrealBloomPass(size, q.bloomStrength, 0.4, 0.92);
+  // the glow is soft anyway, so it is computed at half size (about four times cheaper) on everything but high quality
+  const bloomSize = QUALITY === 'high' ? size : size.clone().multiplyScalar(0.5);
+  const bloom = new UnrealBloomPass(bloomSize, q.bloomStrength, 0.4, 0.92);
   composer.addPass(bloom);
 
   const film = new ShaderPass(FilmShader);

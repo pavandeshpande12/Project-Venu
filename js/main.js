@@ -3,11 +3,14 @@ import { clamp, smoothstep, windowOpacity } from './math.js';
 import { initAudio, toggleSound, armAutoplay, onMusicStart } from './audio.js';
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const PROGRESS_EASE = reduceMotion ? 18 : 5;      // reduced motion: follow the scroll almost instantly, no gliding
+const phone = matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700;
+const PROGRESS_EASE = reduceMotion ? 18 : phone ? 9 : 5;   // phones follow the thumb more closely; reduced motion: almost instantly
 const FRAME_MAX = 0.05;
 const MOUSE_EASE = 3;
 
 const journey = document.getElementById('journey');
+// a mouse wheel covers 8 screens easily, a thumb does not: the journey is shorter on phones (the chapters keep their order)
+if (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700) journey.style.height = '540vh';
 const soundBtn = document.getElementById('sound-btn');
 const scrollPrompt = document.getElementById('scroll-prompt');
 const loader = document.getElementById('loader');
@@ -89,11 +92,19 @@ if (cursorDot && matchMedia('(hover: hover)').matches) {
   })();
 }
 
+// on a phone the journey is shorter, so each caption stays fully visible for longer and fades faster:
+// [start, fully in, fully out, end]  ->  the fades shrink to half, and the middle stretches to fill the gap
+function captionWindow([a, b, c, d]) {
+  if (!phone || a === b) return [a, b, c, d];     // the hero caption is visible from the very top; leave it
+  const fade = Math.min(b - a, d - c) * 0.5;
+  return [a, a + fade, d - fade, d];
+}
+
 const captions = [];
 for (const el of document.querySelectorAll('.caption')) {
   captions.push({
     el,
-    w: el.dataset.window.split(',').map(Number),
+    w: captionWindow(el.dataset.window.split(',').map(Number)),
     ch: Number(el.dataset.chapter || 0),
   });
 }
