@@ -159,8 +159,13 @@ export async function createStage(canvas, onProgress) {
     lights.fill.intensity = 0.5 + pGlow * 0.3;
 
     bloom.strength = baseBloomStrength + pGlow * 0.25;
-    renderer.toneMappingExposure = baseToneExposure;
-    scene.fog.density = baseFogDensity;
+    // phone screens (small, and often dimmed to save battery) get a little more light
+    const tall = Math.min(1, Math.max(0, (0.8 - camera.aspect) / 0.3));
+    renderer.toneMappingExposure = baseToneExposure * (1 + 0.28 * tall);
+    // the fog gives depth to close-ups. When the camera pulls back (phones, to fit the whole flute) it must thin out,
+    // or it would swallow most of the flute's light: keep the same total fog between camera and flute
+    const camDist = camera.position.distanceTo(cameraPath.target);
+    scene.fog.density = baseFogDensity * Math.min(1, 4.5 / camDist) ** 1.6;
     scene.environmentIntensity = baseEnvIntensity + pGlow * 0.1;
 
     if (pulseT > 0) pulseT = Math.max(0, pulseT - dt * 0.7);
