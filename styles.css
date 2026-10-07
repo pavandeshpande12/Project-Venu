@@ -299,12 +299,6 @@ body {
 /* the gate: once loading is done, the loader turns into an invitation */
 html.gated, html.gated body { overflow: hidden; }
 .gate-verse, #enter-btn { opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity 0.9s ease, transform 0.9s ease, visibility 0.9s; }
-.gate-footer {
-  position: absolute; left: 0; right: 0; bottom: calc(var(--edge) * 0.8);
-  text-align: center; padding: 0 1rem;
-  font-family: var(--caps); font-size: 0.58rem; letter-spacing: 0.22em;
-  color: rgba(228,213,192,0.45);
-}
 #loader.ready .label { animation: none; opacity: 0.7; }
 #loader.ready .gate-verse, #loader.ready #enter-btn { opacity: 1; visibility: visible; transform: none; }
 .gate-verse {
@@ -492,7 +486,6 @@ html.gated, html.gated body { overflow: hidden; }
 }
 .caption.closing .credit a { color: inherit; pointer-events: auto; text-decoration: underline; text-decoration-color: rgba(228,213,192,0.25); text-underline-offset: 3px; }
 .caption.closing .credit a:hover, .caption.closing .credit a:focus-visible { color: var(--cream); }
-.caption.closing .credit.built { margin-top: 0.45rem; text-transform: none; color: rgba(228,213,192,0.5); }
 .closing-actions {
   margin-top: 2.5rem; display: flex; justify-content: center; gap: 1rem;
   pointer-events: auto;
