@@ -50,7 +50,7 @@ function createLights(scene, renderer) {
   const key = new THREE.SpotLight(0xfff0d0, 190, 0, 0.5, 0.8, 2);
   key.position.set(-4, 10, 12);
   key.target.position.set(0, 0, 0);
-  key.castShadow = true;
+  key.castShadow = renderer.shadowMap.enabled;
   const shadowRes = getQuality() === 'high' ? 1024 : 512;
   key.shadow.mapSize.set(shadowRes, shadowRes);
   key.shadow.bias = -0.0004;
@@ -96,7 +96,7 @@ export async function createStage(canvas, onProgress) {
   scene.add(dust.points);
   if (onProgress) onProgress(0.7);
 
-  const { composer, bloom, film, bokeh } = createComposer(renderer, scene, camera);
+  const { composer, bloom, film, bokeh, dither } = createComposer(renderer, scene, camera);
   if (onProgress) onProgress(0.9);
 
   try { await renderer.compileAsync(scene, camera); } catch {}
@@ -118,11 +118,14 @@ export async function createStage(canvas, onProgress) {
   function setDrag(rx, ry) { dragRX = rx; dragRY = ry; }
   function setDragging(v) { dragging = v; }
 
+  let sizedW = 0, sizedH = 0, sizedR = 0;
   function resize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (w === sizedW && h === sizedH && renderer.getPixelRatio() === sizedR) return;   // nothing new: do not rebuild the render targets
+    sizedW = w; sizedH = h; sizedR = renderer.getPixelRatio();
     renderer.setSize(w, h);
     composer.setSize(w, h);
   }
@@ -132,11 +135,11 @@ export async function createStage(canvas, onProgress) {
   function watchSpeed(dt) {
     age += dt;
     frameEma += (dt - frameEma) * 0.06;
-    if (age < 4) return;                                   // skip start-up (shader compiling, textures arriving)
-    slow = frameEma > 1 / 34 ? slow + dt : Math.max(0, slow - dt * 2);
+    if (age < 3) return;                                   // skip start-up (shader compiling, textures arriving)
+    slow = frameEma > 1 / 44 ? slow + dt : Math.max(0, slow - dt * 2);
     const ratio = renderer.getPixelRatio();
-    if (slow > 2 && ratio > 1) {
-      renderer.setPixelRatio(Math.max(1, ratio * 0.8));
+    if (slow > 1.2 && ratio > 1) {
+      renderer.setPixelRatio(Math.max(1, ratio * 0.75));
       resize();
       slow = 0;
     }
@@ -199,11 +202,21 @@ export async function createStage(canvas, onProgress) {
     }
 
     film.uniforms.uTime.value = time;
+    dither.uniforms.uTime.value = time;
 
     composer.render();
   }
 
   resize();
+  function info() {
+    const gl = renderer.getContext();
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    return {
+      ratio: renderer.getPixelRatio(), width: renderer.domElement.width, height: renderer.domElement.height,
+      quality: getQuality(), gpu: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : 'unknown',
+      calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+    };
+  }
   function setZoom(z, fx, fy) { cameraPath.setZoom(z, fx, fy); }
-  return { update, resize, setMouse, triggerPulse, setDrag, setDragging, setZoom, get zoom() { return cameraPath.zoomGoal; } };
+  return { update, resize, info, setMouse, triggerPulse, setDrag, setDragging, setZoom, get zoom() { return cameraPath.zoomGoal; } };
 }

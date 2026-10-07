@@ -6,6 +6,8 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
+export const IS_PHONE = /mobi|android|iphone|ipad/i.test(navigator.userAgent);
+
 const FilmShader = {
   uniforms: {
     tDiffuse: { value: null },
@@ -48,7 +50,7 @@ const FilmShader = {
 
       color *= 1.0 - edge * uVignette;
 
-      float grain = hash(vUv * 800.0 + fract(uTime) * 100.0) - 0.5;
+      float grain = hash(floor(gl_FragCoord.xy) + fract(uTime) * 100.0) - 0.5;   // one grain per drawn pixel, so it can never stretch into blotches
       color += grain * uGrain;
 
       color.r *= 1.03;
@@ -108,7 +110,7 @@ export function createRenderer(canvas) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
-  renderer.shadowMap.enabled = q.shadows;
+  renderer.shadowMap.enabled = q.shadows && !IS_PHONE;     // nothing in the scene casts a shadow; do not pay for the pass on phones
   if (q.shadows) renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   return renderer;
 }
@@ -140,7 +142,23 @@ export function createComposer(renderer, scene, camera) {
   const film = new ShaderPass(FilmShader);
   composer.addPass(film);
 
-  composer.addPass(new OutputPass());
+  // the last pass (tone mapping + colour space) also adds a hair of noise before the 8-bit screen, so the dark blue
+  // gradients do not show bands at full brightness. Folded into this pass, because a pass of its own cost ~10 fps
+  const output = new OutputPass();
+  const DITHER = `
+			vec2 dp = floor( gl_FragCoord.xy );
+			float dn = fract( sin( dot( dp + fract( uTime ) * 37.0, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 )
+			         + fract( sin( dot( dp + 91.7 - fract( uTime ) * 53.0, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 ) - 1.0;
+			gl_FragColor.rgb += dn / 255.0;
+		}`;
+  const src = output.material.fragmentShader;
+  const end = src.lastIndexOf('}');
+  output.material.fragmentShader = src.slice(0, end).replace('uniform sampler2D tDiffuse;', 'uniform sampler2D tDiffuse;\n\t\tuniform float uTime;') + DITHER;
+  output.uniforms.uTime = { value: 0 };
+  composer.addPass(output);
+  const dither = output;            // (scene.js feeds it the time, as it does the film pass)
+  // phones: no film grain at all (a smeared grain on a small bright screen just looks like dirt)
+  if (IS_PHONE) film.uniforms.uGrain.value = 0;
 
-  return { composer, bloom, film, bokeh };
+  return { composer, bloom, film, bokeh, dither };
 }

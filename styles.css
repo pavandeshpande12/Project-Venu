@@ -233,7 +233,7 @@ body {
 /* a soft dark fade across the bottom of the screen, so the chapter text stays readable over bright gold */
 #stage::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 42%;
-  background: linear-gradient(to top, rgba(8,8,16,0.78) 0%, rgba(8,8,16,0.5) 45%, transparent 100%);
+  background: url(assets/dither.png), linear-gradient(to top, rgba(8,8,16,0.78) 0%, rgba(8,8,16,0.5) 45%, transparent 100%);   /* the tiny noise tile dithers the fade, so it shows no bands on a bright screen */
   z-index: 3; pointer-events: none;
 }
 

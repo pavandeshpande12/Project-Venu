@@ -10,7 +10,7 @@ const MOUSE_EASE = 3;
 
 const journey = document.getElementById('journey');
 // a mouse wheel covers 8 screens easily, a thumb does not: the journey is shorter on phones (the chapters keep their order)
-if (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700) journey.style.height = '540vh';
+if (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 700) journey.style.height = CSS.supports('height', '1lvh') ? '540lvh' : '540vh';   // lvh: the full-size screen, so the length cannot change with the address bar
 const soundBtn = document.getElementById('sound-btn');
 const scrollPrompt = document.getElementById('scroll-prompt');
 const loader = document.getElementById('loader');
@@ -121,7 +121,7 @@ for (let i = 0; i < holeButtons.length; i++) {
     holeButtons[i].classList.remove('ripple');
     void holeButtons[i].offsetWidth;
     holeButtons[i].classList.add('ripple');
-    const span = journey.offsetHeight - window.innerHeight;
+    const span = scrollSpan();
     if (lenis) {
       lenis.scrollTo(sectionCenters[i] * span);
     } else {
@@ -138,45 +138,16 @@ soundBtn.addEventListener('click', () => {
 armAutoplay();
 onMusicStart(() => document.body.classList.add('sound-on'));
 
-// ── mouse / gyroscope state ──────────────────────────────────
+// ── mouse state (a gentle parallax on desktop) ───────────────
 let rawMX = 0, rawMY = 0;
 let smoothMX = 0, smoothMY = 0;
-let useGyro = false;
 
 window.addEventListener('mousemove', (e) => {
-  if (!useGyro) {
-    rawMX = (e.clientX / window.innerWidth) * 2 - 1;
-    rawMY = (e.clientY / window.innerHeight) * 2 - 1;
-  }
+  rawMX = (e.clientX / window.innerWidth) * 2 - 1;
+  rawMY = (e.clientY / window.innerHeight) * 2 - 1;
 });
 
-function initGyroscope() {
-  function handleOrientation(e) {
-    if (e.gamma === null) return;
-    useGyro = true;
-    rawMX = clamp(e.gamma / 30, -1, 1);
-    rawMY = clamp((e.beta - 45) / 30, -1, 1);
-  }
-
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
-    document.addEventListener('click', () => {
-      DeviceOrientationEvent.requestPermission()
-        .then(state => {
-          if (state === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation);
-          }
-        })
-        .catch(() => {});
-    }, { once: true });
-  } else if ('DeviceOrientationEvent' in window) {
-    window.addEventListener('deviceorientation', handleOrientation);
-  }
-}
-
-if (/mobi|android|iphone|ipad/i.test(navigator.userAgent)) {
-  initGyroscope();
-}
+// (the phone's motion sensor no longer moves the camera: it made the scene drift with every tremor of the hand)
 
 // ── drag-to-rotate ──────────────────────────────────────────
 const glCanvas = document.getElementById('gl');
@@ -272,14 +243,22 @@ let lastSection = -1;
 let stage = null;
 let lenis = null;
 
+// Scroll progress is measured against the LARGEST screen height (address bar hidden), which never changes.
+// Measuring against the current height made the whole scene jump every time the phone's address bar slid in or out.
+const lvhProbe = document.createElement('div');
+lvhProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+document.body.appendChild(lvhProbe);
+let refHeight = window.innerHeight;
+function measureRefHeight() {
+  const h = lvhProbe.offsetHeight;
+  refHeight = h > 0 ? h : Math.max(refHeight, window.innerHeight);
+}
+measureRefHeight();
+const scrollSpan = () => Math.max(1, journey.offsetHeight - refHeight);
+
 function readScroll() {
-  if (lenis) {
-    const limit = lenis.limit;
-    targetP = limit > 0 ? clamp(lenis.scroll / limit, 0, 1) : 0;
-  } else {
-    const span = journey.offsetHeight - window.innerHeight;
-    targetP = span > 0 ? clamp(window.scrollY / span, 0, 1) : 0;
-  }
+  const y = lenis ? lenis.scroll : window.scrollY;
+  targetP = clamp(y / scrollSpan(), 0, 1);
 }
 
 function detectSection(p) {
@@ -372,6 +351,29 @@ function waitAtGate() {
   });
 }
 
+// ── ?debug: a small read-out of speed and resolution, for finding out what a real phone does ──
+if (new URLSearchParams(location.search).has('debug')) {
+  const box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:99999;margin:0;padding:6px 8px;font:11px/1.35 monospace;color:#9f9;background:rgba(0,0,0,.72);pointer-events:none;white-space:pre-wrap;max-width:94vw';
+  document.body.appendChild(box);
+  let frames = 0, worst = 0, t0 = performance.now(), last = performance.now();
+  (function loop(now) {
+    frames++; worst = Math.max(worst, now - last); last = now;
+    if (now - t0 > 700) {
+      const i = stage ? stage.info() : null;
+      box.textContent = `${Math.round(frames * 1000 / (now - t0))} fps   worst frame ${Math.round(worst)} ms
+` +
+        (i ? `drawn ${i.width}x${i.height} (x${i.ratio.toFixed(2)})  quality ${i.quality}
+${i.gpu}
+${i.calls} draw calls, ${Math.round(i.triangles / 1000)}k triangles` : 'loading...') +
+        `
+screen ${innerWidth}x${innerHeight}  scroll ${(progress * 100).toFixed(1)}%`;
+      frames = 0; worst = 0; t0 = now;
+    }
+    requestAnimationFrame(loop);
+  })(performance.now());
+}
+
 // ── init ─────────────────────────────────────────────────────
 async function init() {
   const fill = loader.querySelector('.loader-fill');
@@ -425,9 +427,12 @@ document.documentElement.classList.add('gated');          // no scrolling behind
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 window.addEventListener('scroll', readScroll, { passive: true });
+let lastWidth = window.innerWidth, resizeTimer = 0;
 window.addEventListener('resize', () => {
+  if (window.innerWidth !== lastWidth) { lastWidth = window.innerWidth; measureRefHeight(); }
   readScroll();
-  if (stage) stage.resize();
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (stage) stage.resize(); }, 180);   // the address bar fires several; rebuild once, when it settles
 });
 readScroll();
 progress = targetP;
