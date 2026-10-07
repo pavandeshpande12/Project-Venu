@@ -8,7 +8,7 @@
 Everything is modelled in the site's own axes: x along the flute, y up, z toward the viewer.
 (B() converts to Blender's z-up; the glTF exporter converts back.)
 
-Run:  D:/Blender/app/blender.exe -b -P tools/make_flute_blender.py [-- preview]
+Run:  blender -b -P tools/make_flute_blender.py [-- preview]
 Writes assets/flute/flute.gltf (+ .bin + textures). With "preview" it also renders tools/_work/prev_*.png.
 """
 import bpy, bmesh, math, os, random, sys

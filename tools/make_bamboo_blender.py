@@ -3,7 +3,7 @@
 The grain is procedural 3D noise evaluated on a cylinder the size of the flute body, then baked to a UV
 image (u = around the flute, v = along it), so it wraps around with no seam.
 
-Run:  D:/Blender/app/blender.exe -b -P tools/make_bamboo_blender.py
+Run:  blender -b -P tools/make_bamboo_blender.py
 Writes tools/bamboo_blender.png (512x2048). Convert with tools/finish_bamboo.py.
 """
 import bpy, bmesh, math, os, sys

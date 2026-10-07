@@ -4,7 +4,7 @@ Everything is additive synthesis + a synthetic room reverb, rendered to a seamle
 Sa = D. Just-intonation ratios (Yaman uses the sharp Ma, 45/32).
 
 Run:  python tools/make_score.py            -> tools/_work/score.wav
-Then: D:/Blender/app/blender.exe -b -P tools/encode_audio.py   (mixes down to assets/score.mp3)
+Then: blender -b -P tools/encode_audio.py   (mixes down to assets/score.mp3)
 """
 import numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve

@@ -38,7 +38,7 @@ then open <http://localhost:8765/>.
 
 ## Rebuilding the flute and feather (needs Blender 4.2+ and Python with numpy, scipy, Pillow)
 
-Run from this folder. Blender is at `D:/Blender/app/blender.exe` on the author's machine; adjust the path.
+Run from this folder. Use the path to your own Blender install if `blender` is not on your PATH.
 
 ```
 # 1. bamboo grain (baked in Blender)

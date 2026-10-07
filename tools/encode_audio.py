@@ -1,6 +1,6 @@
 """Compresses tools/_work/score.wav to assets/score.mp3 using Blender's built-in FFmpeg.
 
-Run:  D:/Blender/app/blender.exe -b -P tools/encode_audio.py
+Run:  blender -b -P tools/encode_audio.py
 """
 import bpy, os, sys, time
 

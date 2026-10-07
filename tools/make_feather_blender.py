@@ -1,6 +1,6 @@
 """Builds the peacock feather in Blender and renders it flat (unlit albedo, transparent background).
 
-Run:  D:/Blender/app/blender.exe -b -P tools/make_feather_blender.py
+Run:  blender -b -P tools/make_feather_blender.py
 Writes tools/feather_blender.png (1024x2048). Convert with tools/finish_feather.py.
 
 Units: the image is 1 wide x 2 tall; x in [-0.5, 0.5], y in [-1, 1]. The quill ends at the bottom centre.
