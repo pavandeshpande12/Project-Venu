@@ -1,0 +1,19 @@
+Copyright (c) 2026 Pavan Deshpande. All rights reserved.
+
+WHAT THIS COVERS
+The design, layout, code, 3D flute model, textures, chapter text and the English
+lines of this project (the "Venu" website) are the work of Pavan Deshpande.
+You may visit the website and read the code. You may not copy, republish,
+redistribute or sell this work, in whole or in part, without written permission.
+
+WHAT THIS DOES NOT COVER
+These parts belong to other people and stay under their own licences:
+
+- Music: "Indian Classical Raga" by Alex Morgan, from Pixabay, used under the
+  Pixabay Content License. The file assets/score.mp3 is an edited copy of that
+  track and is not covered by the notice above.
+- Sanskrit verses: Srimad Bhagavatam 10.21 (the Venu-gita), an ancient text.
+- Fonts: Cormorant Garamond, Cormorant SC and Yatra One, under the SIL Open Font
+  License (see assets/fonts/OFL.txt).
+- Three.js and Lenis, in the vendor/ folder, under the MIT licence (their licence
+  files are kept next to them).

@@ -17,3 +17,9 @@ Best with sound on, and with the phone or screen brightness turned up a little.
 - **3D and scrolling:** Three.js and Lenis
 
 Built by Pavan Deshpande.
+
+## Copyright
+
+© 2026 Pavan Deshpande. All rights reserved. The design, code, 3D flute and text are my own work, so please don't copy or
+republish them without asking. The music, verses, fonts and tools listed above belong to their owners and keep their own
+licences. Details are in the `LICENSE` file.
