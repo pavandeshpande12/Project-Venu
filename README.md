@@ -61,7 +61,7 @@ The music loop was trimmed and crossfaded from the original download (kept local
 
 - **Music:** ["Indian Classical Raga"](https://pixabay.com/music/india-indian-classical-raga-537491/) by Alex Morgan, from Pixabay
   (Pixabay Content License; credit is optional but is given on the closing screen).
-- **Built by** Pavan Deshpande and Claude Opus 5.5.
+- **Built by** Pavan Deshpande.
 - **Verses:** Śrīmad Bhāgavatam 10.21 (the Veṇu-gīta). Sanskrit checked against Vedabase; the English lines are paraphrases.
 - **Fonts:** Cormorant Garamond, Cormorant SC, Yatra One (SIL Open Font License).
 - **Libraries:** Three.js and Lenis (MIT).
